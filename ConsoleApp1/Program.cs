@@ -221,7 +221,7 @@ string GetPath(string header)
 List<MyFile> SetDirectoriesPathsToDestination(List<MyFile> files, string destinationDirectory)
 {
     // SPANISH MONTHS
-    var spanisMonts = new Dictionary<int, string>()
+    var spanishMonts = new Dictionary<int, string>()
     {
         { 1, "Enero" },
         { 2, "Febrero" },
@@ -255,7 +255,7 @@ List<MyFile> SetDirectoriesPathsToDestination(List<MyFile> files, string destina
     };
 
     // Choose the language for the name of the folders
-    var months = spanisMonts;
+    var months = spanishMonts;
 
     foreach (var file in files)
     {

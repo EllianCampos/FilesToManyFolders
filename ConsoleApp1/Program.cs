@@ -1,8 +1,8 @@
 ﻿// Step 1: Set the SOURCE Directory
-string sourceDirectoryPath = GetPath("Set the SOURCE Directory");
+string sourceDirectoryPath = GetPath("STEP 1: Set the SOURCE Directory");
 
 // Step 2: Set the DESTINATION directory
-string destinationDirectoryPath = GetPath("Set the DESTINATION Directory");
+string destinationDirectoryPath = GetPath("STEP 2: Set the DESTINATION Directory");
 
 // Step 3: Read files
 var files = CustomEnumeration(sourceDirectoryPath);
@@ -18,7 +18,7 @@ while (!isConfirmationValid)
         "Confirm",
         $"Files found:  {files.Count}\n" +
         $"From:         {sourceDirectoryPath}\n" +
-        $"To:           {destinationDirectoryPath}",
+        $"To:           {destinationDirectoryPath}\n",
         $"\n[y] to confirm\n[x] to cancel\n"
     );
     Console.WriteLine("-> ");
@@ -35,22 +35,38 @@ while (!isConfirmationValid)
 }
 
 // Step 6: Proceed the files
+int fileNumber = 1;
+int totalFiles = files.Count;
+int countFilesCopied = 0;
+
 foreach (var file in filesWtihDestination)
 {
+    // Valida if the directory exists
     if (!Directory.Exists(file.DestinationPath))
     {
+        // Create the diretory if does no exits
         Directory.CreateDirectory(file.DestinationPath!);
     }
 
-    File.Copy(file.Sourcepath, file.DestinationFile!);
+    // validate if the file exists
+    if (!File.Exists(file.DestinationFile))
+    {
+        // Copy the file if does not exits
+        File.Copy(file.Sourcepath, file.DestinationFile!);
+        countFilesCopied++;
+    }
+        
+    Console.WriteLine(fileNumber++ + "/" + totalFiles);
 }
+
+Console.WriteLine("Process finished!. " + countFilesCopied + " files have been copied");
 
 void PrintMenu(string header, string body, string? footer)
 {
     Console.Clear();
     Console.WriteLine(
-            "##############################################################\n" +
-            $"{header}\n"+
+            "##############################################################\n\n" +
+            $"{header}\n\n"+
             "##############################################################\n\n" +
             $"{body}\n" +
             "##############################################################\n" 
@@ -134,31 +150,46 @@ string GetPath(string header)
 {
     bool ready = false;
     string path = "";
-    string footer = $"[y] to confirm: {path}\n[b] to back\n";
-
+    
     while (!ready)
-    {
+    {        
         string optionChosed;
 
         if (path == "")
             path = GetDrive(header);
 
         var directories = Directory.EnumerateDirectories(path);
+
+       
+
+        //if (directories.Any())
+        //{
+        //    int i = 1;
+        //    string body = "";
+        //    foreach (var d in directories)
+        //        body += $"[{i++}] {d.Substring(d.LastIndexOf("\\") + 1)}\n";
+
+        //    PrintMenu(header, body, footer);
+        //}
+        //else
+        //{
+        //    var files = CustomEnumeration(path);
+        //    PrintMenu(header, $"{files.Count} found\n", footer);
+        //}
+
+        // Show directories
+        int i = 1;
+        string body = "";
+        foreach (var d in directories)
+            body += $"[{i++}] {d.Substring(d.LastIndexOf("\\") + 1)}\n";
         
-        if (directories.Any())
-        {
-            int i = 1;
-            string body = "";
-            foreach (var d in directories)
-                body += $"[{i++}] {d.Substring(d.LastIndexOf("\\") + 1)}\n";
-            
-            PrintMenu(header, body, footer);
-        }
-        else
-        {
-            var files = CustomEnumeration(path);
-            PrintMenu(header, $"{files.Count} found\n", footer);
-        }
+
+        // Show the count of files
+        var files = CustomEnumeration(path);
+        string footer = $"[y] to confirm: {path}          ({files.Count()}) files found \n[b] to back\n";
+
+        PrintMenu(header, body, footer);
+
 
         Console.Write("->");
         optionChosed = Console.ReadLine()!;
@@ -259,13 +290,14 @@ List<MyFile> SetDirectoriesPathsToDestination(List<MyFile> files, string destina
 
     foreach (var file in files)
     {
+        var monthNum = file.Date.Month;
         var month = "";
-        months.TryGetValue(file.Date.Month, out month);
+        months.TryGetValue(monthNum, out month);
 
         var year = file.Date.Year;
 
-        file.DestinationPath = $"{destinationDirectory}\\{year} {month}";
-        file.DestinationFile = $"{destinationDirectory}\\{year} {month}{file.FileName}";
+        file.DestinationPath = $"{destinationDirectory}\\ {year} - {monthNum}({month})";
+        file.DestinationFile = $"{file.DestinationPath}{file.FileName}";
 
     }
 
